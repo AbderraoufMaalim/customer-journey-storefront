@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-
+import Popup from "@modules/popups"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
 
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 export default async function PageLayout(props: { children: React.ReactNode }) {
   return (
     <>
+      <Popup/>
       <Nav />
       {props.children}
       <Footer />
