@@ -11,17 +11,28 @@ import User from "@modules/common/icons/user"
 import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useEffect } from "react"
 
 const AccountNav = ({
   customer,
 }: {
   customer: Omit<Customer, "password_hash"> | null
 }) => {
+  useEffect(() => {
+    console.log("hh", customer)
+
+    if (customer) {
+      localStorage.setItem("customer_email", customer.email)
+    }
+  }, [])
+
   const route = usePathname()
   const { countryCode } = useParams()
 
   const handleLogout = async () => {
     await signOut()
+
+    localStorage.removeItem("customer_email")
   }
 
   return (
@@ -114,27 +125,47 @@ const AccountNav = ({
           <div className="text-base-regular">
             <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
               <li>
-                <AccountNavLink href="/account" route={route!} data-testid="overview-link">
+                <AccountNavLink
+                  href="/account"
+                  route={route!}
+                  data-testid="overview-link"
+                >
                   Overview
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/account/profile" route={route!} data-testid="profile-link">
+                <AccountNavLink
+                  href="/account/profile"
+                  route={route!}
+                  data-testid="profile-link"
+                >
                   Profile
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/account/addresses" route={route!} data-testid="addresses-link">
+                <AccountNavLink
+                  href="/account/addresses"
+                  route={route!}
+                  data-testid="addresses-link"
+                >
                   Addresses
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/account/orders" route={route!} data-testid="orders-link">
+                <AccountNavLink
+                  href="/account/orders"
+                  route={route!}
+                  data-testid="orders-link"
+                >
                   Orders
                 </AccountNavLink>
               </li>
               <li className="text-grey-700">
-                <button type="button" onClick={handleLogout}  data-testid="logout-button">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  data-testid="logout-button"
+                >
                   Log out
                 </button>
               </li>

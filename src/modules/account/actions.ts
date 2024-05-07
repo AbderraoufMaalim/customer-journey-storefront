@@ -27,6 +27,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     first_name: formData.get("first_name"),
     last_name: formData.get("last_name"),
     phone: formData.get("phone"),
+    workflowId: "haha",
   } as StorePostCustomersReq
 
   try {
@@ -266,6 +267,7 @@ export async function signOut() {
   cookies().set("_medusa_jwt", "", {
     maxAge: -1,
   })
+
   const nextUrl = headers().get("next-url")
   const countryCode = nextUrl?.split("/")[1] || ""
   revalidateTag("auth")

@@ -253,6 +253,9 @@ export async function getToken(credentials: StorePostAuthReq) {
           sameSite: "strict",
           secure: process.env.NODE_ENV === "production",
         })
+      console.log(access_token, " this is the token")
+
+      localStorage.setItem("jwt_token", access_token)
       return access_token
     })
     .catch((err) => {
