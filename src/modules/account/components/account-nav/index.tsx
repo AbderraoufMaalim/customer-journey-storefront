@@ -3,7 +3,7 @@
 import { Customer } from "@medusajs/medusa"
 import { clx } from "@medusajs/ui"
 import { ArrowRightOnRectangle } from "@medusajs/icons"
-import { useParams, usePathname } from "next/navigation"
+import { useParams, usePathname, useRouter } from "next/navigation"
 
 import ChevronDown from "@modules/common/icons/chevron-down"
 import { signOut } from "@modules/account/actions"
@@ -12,27 +12,32 @@ import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useEffect } from "react"
+import useUser from "@lib/hooks/use-user"
 
 const AccountNav = ({
   customer,
 }: {
   customer: Omit<Customer, "password_hash"> | null
 }) => {
-  useEffect(() => {
-    console.log("hh", customer)
-
-    if (customer) {
-      localStorage.setItem("customer_email", customer.email)
-    }
-  }, [])
+  const user = useUser()
+  const router = useRouter()
 
   const route = usePathname()
   const { countryCode } = useParams()
 
+  useEffect(() => {
+    console.log("hh", customer)
+
+    if (customer) {
+      user.setEmail(customer.email)
+    }
+  }, [])
+
+
   const handleLogout = async () => {
     await signOut()
 
-    localStorage.removeItem("customer_email")
+    user.setEmail('no email')
   }
 
   return (

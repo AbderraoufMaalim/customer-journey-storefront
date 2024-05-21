@@ -41,9 +41,7 @@ export default function inviteToSubscribe() {
           {' '}
          Subscribe Now ! 
           <br />
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur sit
-          commodi beatae optio voluptatum sed eius cumque, delectus saepe repudiandae
-          explicabo nemo nam libero ad, doloribus, voluptas rem alias. Vitae?
+          Pour une expérience personnalisée et recevoir des recommandations de vélos adaptées à vos besoins,<br/> veuillez vous connecter ou créer un compte.
         </div>
         <div className="actions">
           <button

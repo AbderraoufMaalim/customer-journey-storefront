@@ -1,6 +1,8 @@
 "use client"
+import useUser from "@lib/hooks/use-user"
 import React, { createContext, FC, ReactNode, useEffect, useState } from "react"
 import io, { Socket } from "socket.io-client"
+
 
 interface SocketContextType {
   socket: Socket | null
@@ -16,6 +18,8 @@ const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
   const BASE_URL = "http://localhost:9000"
 
   const [socket, setSocket] = useState<Socket | null>(null)
+  const user = useUser()
+  
 
   useEffect(() => {
     if (!socket) {
@@ -25,8 +29,15 @@ const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
       setSocket(newSocket)
     }
     if (socket) {
+      
+
       socket.on("connect", () => {
         console.log("hello")
+        socket.emit('check-workflow-id', user.workflowId);
+      })
+
+      socket.on('set-workflow-id', (payload :string) =>{
+        user.setWorkflowId(payload)
       })
 
       socket.on("openBot", () => {
