@@ -13,6 +13,7 @@ import Package from "@modules/common/icons/package"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useEffect } from "react"
 import useUser from "@lib/hooks/use-user"
+import useSocket from "@lib/hooks/use-socket"
 
 const AccountNav = ({
   customer,
@@ -20,24 +21,24 @@ const AccountNav = ({
   customer: Omit<Customer, "password_hash"> | null
 }) => {
   const user = useUser()
-  const router = useRouter()
-
   const route = usePathname()
   const { countryCode } = useParams()
+  const socketIo = useSocket()
 
   useEffect(() => {
-    console.log("hh", customer)
-
     if (customer) {
       user.setEmail(customer.email)
+      socketIo.socket?.emit("get-customer-workflow-id", {
+        email: customer.email,
+      })
     }
   }, [])
-
 
   const handleLogout = async () => {
     await signOut()
 
-    user.setEmail('no email')
+    user.setEmail("no email")
+    socketIo.socket?.emit("get-new-workflow-id")
   }
 
   return (

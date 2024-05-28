@@ -27,7 +27,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     first_name: formData.get("first_name"),
     last_name: formData.get("last_name"),
     phone: formData.get("phone"),
-    workflowId: "haha",
+    workflowId: formData.get("workflow-id"),
   } as StorePostCustomersReq
 
   try {
