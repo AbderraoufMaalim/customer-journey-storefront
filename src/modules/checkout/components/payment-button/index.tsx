@@ -9,13 +9,18 @@ import { placeOrder } from "@modules/checkout/actions"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 import Spinner from "@modules/common/icons/spinner"
+import useSocket from "@lib/hooks/use-socket"
+import useUser from "@lib/hooks/use-user"
 
 type PaymentButtonProps = {
-  cart: Omit<Cart, "refundable_amount" | "refunded_total">,
-  'data-testid': string
+  cart: Omit<Cart, "refundable_amount" | "refunded_total">
+  "data-testid": string
 }
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, 'data-testid': dataTestId }) => {
+const PaymentButton: React.FC<PaymentButtonProps> = ({
+  cart,
+  "data-testid": dataTestId,
+}) => {
   const notReady =
     !cart ||
     !cart.shipping_address ||
@@ -29,11 +34,29 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, 'data-testid': data
 
   switch (paymentSession.provider_id) {
     case "stripe":
-      return <StripePaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
+      return (
+        <StripePaymentButton
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
+      )
     case "manual":
-      return <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+      return (
+        <ManualTestPaymentButton
+          cart={cart}
+          notReady={notReady}
+          data-testid={dataTestId}
+        />
+      )
     case "paypal":
-      return <PayPalPaymentButton notReady={notReady} cart={cart} data-testid={dataTestId} />
+      return (
+        <PayPalPaymentButton
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
+      )
     default:
       return <Button disabled>Select a payment method</Button>
   }
@@ -42,14 +65,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, 'data-testid': data
 const StripePaymentButton = ({
   cart,
   notReady,
-  'data-testid': dataTestId
+  "data-testid": dataTestId,
 }: {
   cart: Omit<Cart, "refundable_amount" | "refunded_total">
   notReady: boolean
-  'data-testid'?: string
+  "data-testid"?: string
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const io = useSocket()
 
   const onPaymentCompleted = async () => {
     await placeOrder().catch(() => {
@@ -133,7 +158,10 @@ const StripePaymentButton = ({
       >
         Place order
       </Button>
-      <ErrorMessage error={errorMessage} data-testid="stripe-payment-error-message" />
+      <ErrorMessage
+        error={errorMessage}
+        data-testid="stripe-payment-error-message"
+      />
     </>
   )
 }
@@ -141,14 +169,16 @@ const StripePaymentButton = ({
 const PayPalPaymentButton = ({
   cart,
   notReady,
-  'data-testid': dataTestId
+  "data-testid": dataTestId,
 }: {
   cart: Omit<Cart, "refundable_amount" | "refunded_total">
   notReady: boolean
-  'data-testid'?: string
+  "data-testid"?: string
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const io = useSocket()
 
   const onPaymentCompleted = async () => {
     await placeOrder().catch(() => {
@@ -194,21 +224,40 @@ const PayPalPaymentButton = ({
           disabled={notReady || submitting || isPending}
           data-testid={dataTestId}
         />
-        <ErrorMessage error={errorMessage} data-testid="paypal-payment-error-message" />
+        <ErrorMessage
+          error={errorMessage}
+          data-testid="paypal-payment-error-message"
+        />
       </>
     )
   }
 }
 
-const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+const ManualTestPaymentButton = ({
+  notReady,
+  cart,
+}: {
+  notReady: boolean
+  cart: Omit<Cart, "refundable_amount" | "refunded_total">
+}) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  const io = useSocket()
+  const user = useUser()
+
   const onPaymentCompleted = async () => {
-    await placeOrder().catch((err) => {
-      setErrorMessage(err.toString())
-      setSubmitting(false)
-    })
+    await placeOrder()
+      .then(() => {
+        io.socket?.emit("order-placed", {
+          cartId: cart.id,
+          workflowId: user.workflowId,
+        })
+      })
+      .catch((err) => {
+        setErrorMessage(err.toString())
+        setSubmitting(false)
+      })
   }
 
   const handlePayment = () => {
@@ -228,7 +277,10 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
       >
         Place order
       </Button>
-      <ErrorMessage error={errorMessage} data-testid="manual-payment-error-message" />
+      <ErrorMessage
+        error={errorMessage}
+        data-testid="manual-payment-error-message"
+      />
     </>
   )
 }
