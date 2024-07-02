@@ -13,17 +13,15 @@ export const metadata: Metadata = {
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" data-mode="light">
-      <head>
-      </head>
+      <head></head>
       <body>
         <UserProvider>
-
-        <SocketProvider>
-          <Bot/>
-          <main className="relative">{props.children}</main>
-        </SocketProvider>
+          <SocketProvider>
+            <Bot />
+            <main className="relative">{props.children}</main>
+          </SocketProvider>
         </UserProvider>
-      </body>   
+      </body>
     </html>
   )
 }
